@@ -1,4 +1,4 @@
-# Log for golang
+# Log for golang, goji log, gorm log
 
 ### Installation:
 ```
