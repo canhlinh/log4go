@@ -12,7 +12,7 @@ import (
 func main() {
 	log.AddFilter("stdout", log.DEBUG, log.NewConsoleLogWriter())
 	goji.Abandon(middleware.Logger)
-	goji.Use(log.NewGojiLog("my-app-name"))
+	goji.Use(log.NewGojiLog())
 	goji.Get("/ping", yourHandler)
 	goji.Serve()
 }
