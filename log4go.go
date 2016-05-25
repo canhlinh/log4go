@@ -89,6 +89,7 @@ const (
 	COLOR_PURPLE = "\033[0;35m"
 	COLOR_CYAN   = "\033[0;36m"
 	COLOR_WHILE  = "\033[0;37m"
+	BG_RED_WHILE = "\033[1;97;41m"
 )
 
 // Logging level strings
@@ -241,19 +242,19 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 func (log Logger) formatColor(lvl Level, msg string) (output string) {
 	switch lvl {
 	case FINEST:
-		output = fmt.Sprintf("%s %s %s", COLOR_BLACK, msg, COLOR_OFF)
+		output = fmt.Sprintf("%s %s %s", COLOR_GREEN, msg, COLOR_OFF)
 		break
 	case FINE:
-		output = fmt.Sprintf("%s %s %s", COLOR_BLUE, msg, COLOR_OFF)
+		output = fmt.Sprintf("%s %s %s", COLOR_BLACK, msg, COLOR_OFF)
 		break
 	case DEBUG:
 		output = fmt.Sprintf("%s %s %s", COLOR_CYAN, msg, COLOR_OFF)
 		break
 	case TRACE:
-		output = fmt.Sprintf("%s %s %s", COLOR_GREEN, msg, COLOR_OFF)
+		output = fmt.Sprintf("%s %s %s", COLOR_PURPLE, msg, COLOR_OFF)
 		break
 	case INFO:
-		output = fmt.Sprintf("%s %s %s", COLOR_PURPLE, msg, COLOR_OFF)
+		output = fmt.Sprintf("%s %s %s", COLOR_WHILE, msg, COLOR_OFF)
 		break
 	case WARNING:
 		output = fmt.Sprintf("%s %s %s", COLOR_YELLOW, msg, COLOR_OFF)
@@ -262,7 +263,7 @@ func (log Logger) formatColor(lvl Level, msg string) (output string) {
 		output = fmt.Sprintf("%s %s %s", COLOR_RED, msg, COLOR_OFF)
 		break
 	case CRITICAL:
-		output = fmt.Sprintf("%s %s %s", COLOR_WHILE, msg, COLOR_OFF)
+		output = fmt.Sprintf("%s %s %s", BG_RED_WHILE, msg, COLOR_OFF)
 		break
 	}
 	return
