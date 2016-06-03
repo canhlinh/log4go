@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-import log "github.com/Innovatube/log4go"
+import log "github.com/canhlinh/log4go"
 
 func main() {
 	defer log.Close()

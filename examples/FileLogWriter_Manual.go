@@ -2,7 +2,7 @@ package main
 
 import "time"
 
-import l4g "github.com/Innovatube/log4go"
+import log "github.com/canhlinh/log4go"
 
 const (
 	filename = "flw.log"

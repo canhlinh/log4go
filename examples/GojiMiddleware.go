@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	log "github.com/Innovatube/log4go"
+	log "github.com/canhlinh/log4go"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	"github.com/zenazn/goji/web/middleware"
