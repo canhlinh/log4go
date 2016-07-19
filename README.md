@@ -1,14 +1,14 @@
-# Log for golang, goji log, gorm log
+# Log for golang, goji log, gorm log, echo log
 
 ### Installation:
 ```
-go get github.com/Innovatube/log4go
+go get github.com/canhlinh/log4go
 ```
 
 ### Usage:
 - Add the following import:
 ```
-import log "github.com/Innovatube/log4go"
+import log "github.com/canhlinh/log4go"
 ```
 
 ### Example
