@@ -18,7 +18,7 @@ func (this GormLogger) Print(values ...interface{}) {
 	if len(values) > 1 {
 		level := values[0]
 		source := fmt.Sprintf("%v", values[1])
-		Debug(source)
+		writeHttpLoging(source)
 
 		if level == "sql" {
 			// duration
@@ -62,7 +62,7 @@ func (this GormLogger) Print(values ...interface{}) {
 				}
 			}
 			messages = messages + sql
-			Debug(messages)
+			writeHttpLoging(messages)
 		}
 	}
 }
