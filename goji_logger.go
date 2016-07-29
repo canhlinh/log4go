@@ -3,12 +3,16 @@ package log4go
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/peterbourgon/g2s"
 )
+
+var LastPathParamIntegerRegex = regexp.MustCompile(`\_[0-9]{1,}$`)
+var PathParamIntegerRegex = regexp.MustCompile(`\_[0-9]{1,}\_`)
 
 type StatsdConfig struct {
 	// IP and port of the statsd server. Optional. Default to "127.0.0.1:8125".
@@ -30,26 +34,26 @@ type gojiStatds struct {
 
 func (g gojiLogger) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
-	writeHttpLoging(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.RequestURI, req.RemoteAddr))
+	writeHttpLoging(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.URL.Path, req.RemoteAddr))
 	lresp := wrapWriter(resp)
-	start := time.Now()
+	startAt := time.Now()
 	g.h.ServeHTTP(lresp, req)
 	lresp.maybeWriteHeader()
 
-	latency := float64(time.Since(start)) / float64(time.Millisecond)
+	latency := float64(time.Since(startAt)) / float64(time.Millisecond)
 	writeHttpLoging(fmt.Sprintf("Returning %d in %s", lresp.status(), fmt.Sprintf("%6.4f ms", latency)))
 }
 
 func (g gojiStatds) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	start := time.Now()
+	startAt := time.Now()
 	if g.WriteLog {
-		writeHttpLoging(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.RequestURI, req.RemoteAddr))
+		writeHttpLoging(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.URL.Path, req.RemoteAddr))
 	}
 	lresp := wrapWriter(resp)
 
 	g.h.ServeHTTP(lresp, req)
 	lresp.maybeWriteHeader()
-	elapsedTime := time.Since(start)
+	elapsedTime := time.Since(startAt)
 	latency := float64(elapsedTime) / float64(time.Millisecond)
 
 	if g.WriteLog {
@@ -60,12 +64,12 @@ func (g gojiStatds) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	apiURI := strings.Replace(req.RequestURI, "/", "_", -1)
+	apiName := ReplaceIntegerPathParameters(req.URL.Path, PathParamIntegerRegex, LastPathParamIntegerRegex)
 	keyBase := ""
 	if g.Config.Prefix != "" {
 		keyBase += g.Config.Prefix + "."
 	}
-	keyBase += apiURI + "."
+	keyBase += apiName + "."
 	keyBase += req.Method + "."
 	statsd.Counter(1.0, keyBase+"status_code."+strconv.Itoa(lresp.status()), 1)
 	statsd.Timing(1.0, keyBase+"elapsed_time.", elapsedTime)
@@ -102,4 +106,25 @@ func writeHttpLoging(msg string) {
 	for _, filt := range Global {
 		filt.LogWrite(rec)
 	}
+}
+
+func ReplaceIntegerPathParameters(input string, pathRegex *regexp.Regexp, lastPathRegex *regexp.Regexp) (output string) {
+	output = strings.Replace(input, "/", "_", -1)
+	matchs := pathRegex.FindAllStringSubmatch(output, -1)
+
+	for _, match := range matchs {
+		if match[0] != "" {
+			output = strings.Replace(output, match[0], "_id_", -1)
+		}
+	}
+	output = replaceLastIntegerPathParameters(output, lastPathRegex)
+	return output
+}
+
+func replaceLastIntegerPathParameters(input string, r *regexp.Regexp) (output string) {
+	match := r.FindStringSubmatch(input)
+	if len(match) > 0 && match[0] != "" {
+		output = strings.Replace(input, match[0], "_id", -1)
+	}
+	return output
 }
