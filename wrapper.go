@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 var (
@@ -103,6 +104,33 @@ func Logf(lvl Level, format string, args ...interface{}) {
 // Wrapper for (*Logger).Logc
 func Logc(lvl Level, closure func() string) {
 	Global.intLogc(lvl, closure)
+}
+
+// Migration support only for Migration ouput
+func Migration(level Level, arg0 interface{}, args ...interface{}) {
+	var msg string
+	switch first := arg0.(type) {
+	case string:
+		// Use the string as a format string
+		msg = fmt.Sprintf(first, args...)
+	case func() string:
+		// Log the closure (no other arguments used)
+		msg = first()
+	default:
+		// Build a format string so that it will be similar to Sprint
+		msg = fmt.Sprintf(fmt.Sprint(first)+strings.Repeat(" %v", len(args)), args...)
+	}
+
+	msg = Global.formatColor(level, msg)
+	rec := &LogRecord{
+		Level:   level,
+		Created: time.Now(),
+		Source:  "Migration",
+		Message: msg,
+	}
+	for _, filt := range Global {
+		filt.LogWrite(rec)
+	}
 }
 
 // Utility for finest log messages (see Debug() for parameter explanation)
