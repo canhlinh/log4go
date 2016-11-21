@@ -169,7 +169,7 @@ func strToNumSuffix(str string, mult int) int {
 }
 func xmlToFileLogWriter(filename string, props []xmlProperty, enabled bool) (*FileLogWriter, bool) {
 	file := ""
-	format := "[%D %T] [%L] (%S) %M"
+	format := "[%D %T] [%L] [%S] %M"
 	maxlines := 0
 	maxsize := 0
 	daily := false

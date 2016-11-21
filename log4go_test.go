@@ -56,7 +56,7 @@ var formatTests = []struct {
 		},
 		Formats: map[string]string{
 			// TODO(kevlar): How can I do this so it'll work outside of PST?
-			FORMAT_DEFAULT: "[2009/02/13 23:31:30 UTC] [EROR] (source) message\n",
+			FORMAT_DEFAULT: "[2009/02/13 23:31:30 UTC] [EROR] [source] message\n",
 			FORMAT_SHORT:   "[23:31 13/02/09] [EROR] message\n",
 			FORMAT_ABBREV:  "[EROR] message\n",
 		},
@@ -89,12 +89,13 @@ var logRecordWriteTests = []struct {
 			Message: "message",
 			Created: now,
 		},
-		Console: "[23:31:30 UTC 2009/02/13] [CRIT] message\n",
+		Console: "[23:31:30 UTC 2009/02/13] [CRIT] [source] message\n",
 	},
 }
 
 func TestConsoleLogWriter(t *testing.T) {
-	console := ConsoleLogWriter{}
+
+	console := NewConsoleLogWriter()
 
 	r, w := io.Pipe()
 	go console.run(w)
@@ -106,6 +107,7 @@ func TestConsoleLogWriter(t *testing.T) {
 		name := test.Test
 
 		console.LogWrite(test.Record)
+
 		n, _ := r.Read(buf)
 
 		if got, want := string(buf[:n]), test.Console; got != want {
@@ -217,7 +219,7 @@ func TestLogger(t *testing.T) {
 
 func TestLogOutput(t *testing.T) {
 	const (
-		expected = "fdf3e51e444da56b4cb400f30bc47424"
+		expected = "dc4a54630ff35da61307d0b60955d656"
 	)
 
 	// Unbuffered output
