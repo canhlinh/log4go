@@ -1,8 +1,10 @@
 package log4go
 
-import "time"
+import (
+	"time"
 
-import "github.com/getsentry/raven-go"
+	"github.com/getsentry/raven-go"
+)
 
 //SentryLogWriter This is the standard writer that prints to standard output.
 type SentryLogWriter struct {
@@ -36,6 +38,7 @@ func (c *SentryLogWriter) run(o chan string) {
 			"level":  rec.Level.String(),
 			"source": rec.Source,
 		})
+
 		if o != nil {
 			o <- eventID
 		}
@@ -51,6 +54,8 @@ func (c *SentryLogWriter) LogWrite(rec *LogRecord) {
 // Close stops the logger from sending messages to standard output.  Attempts to
 // send log messages to this logger after a Close have undefined behavior.
 func (c *SentryLogWriter) Close() {
+	c.client.Wait()
+	c.client.Close()
 	close(c.w)
 	time.Sleep(50 * time.Millisecond) // Try to give console I/O time to complete
 }

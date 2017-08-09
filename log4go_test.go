@@ -144,7 +144,7 @@ func TestSentryLogWriter(t *testing.T) {
 
 	o := make(chan string, 1)
 	go w.run(o)
-	w.LogWrite(newLogRecord(CRITICAL, "log4go_test", "TestSentryLogWriter"))
+	w.LogWrite(newLogRecord(CRITICAL, "log4go_test.go", fmt.Sprintf("Test message %d", time.Now().UnixNano())))
 	eventID := <-o
 	if len(eventID) != 32 {
 		t.Fatal("sentry id must equal 32 character length")
