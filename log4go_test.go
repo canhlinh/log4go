@@ -1,5 +1,3 @@
-// Copyright (C) 2010, Kyle Lemons <kyle@kylelemons.net>.  All rights reserved.
-
 package log4go
 
 import (
@@ -89,7 +87,7 @@ var logRecordWriteTests = []struct {
 			Message: "message",
 			Created: now,
 		},
-		Console: "[23:31:30 UTC 2009/02/13] [CRIT] [source] message\n",
+		Console: "[2009/02/13 23:31:30 UTC] [CRIT] [source] message\n",
 	},
 }
 
@@ -138,6 +136,21 @@ func TestFileLogWriter(t *testing.T) {
 	} else if len(contents) != 50 {
 		t.Errorf("malformed filelog: %q (%d bytes)", string(contents), len(contents))
 	}
+}
+
+func TestSentryLogWriter(t *testing.T) {
+
+	w := NewSentryLogWriter("https://ad6ea7dafdfe4a90914ce0d325d9a01c:f50a8e206c0447afaec9b74f20393f85@sentry.io/201532")
+
+	o := make(chan string, 1)
+	go w.run(o)
+	w.LogWrite(newLogRecord(CRITICAL, "log4go_test", "TestSentryLogWriter"))
+	eventID := <-o
+	if len(eventID) != 32 {
+		t.Fatal("sentry id must equal 32 character length")
+	}
+	w.Close()
+	runtime.Gosched()
 }
 
 func TestXMLLogWriter(t *testing.T) {
