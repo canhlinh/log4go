@@ -31,10 +31,6 @@ const (
 	WARNING
 	ERROR
 	CRITICAL
-)
-
-// Colors
-const (
 	COLOR_OFF    = "\033[0m"
 	COLOR_BLACK  = "\033[0;30m"
 	COLOR_RED    = "\033[0;31m"
@@ -50,6 +46,7 @@ const (
 // Logging level strings
 var (
 	levelStrings = [...]string{"FNST", "FINE", "DEBG", "TRAC", "INFO", "WARN", "EROR", "CRIT"}
+	colorStrings = [...]string{COLOR_GREEN, COLOR_BLACK, COLOR_CYAN, COLOR_PURPLE, COLOR_WHILE, COLOR_YELLOW, COLOR_RED, BG_RED_WHILE}
 )
 
 func (l Level) String() string {
@@ -57,6 +54,13 @@ func (l Level) String() string {
 		return "UNKNOWN"
 	}
 	return levelStrings[int(l)]
+}
+
+func (l Level) Color() string {
+	if l < 0 || int(l) > len(colorStrings) {
+		return "UNKNOWN"
+	}
+	return colorStrings[int(l)]
 }
 
 /****** Variables ******/
@@ -177,8 +181,6 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 	if len(args) > 0 {
 		msg = fmt.Sprintf(format, args...)
 	}
-
-	msg = log.formatColor(lvl, msg)
 	// Make the log record
 	rec := &LogRecord{
 		Level:   lvl,
@@ -194,36 +196,6 @@ func (log Logger) intLogf(lvl Level, format string, args ...interface{}) {
 		}
 		filt.LogWrite(rec)
 	}
-}
-
-func (log Logger) formatColor(lvl Level, msg string) (output string) {
-	switch lvl {
-	case FINEST:
-		output = fmt.Sprintf("%s %s %s", COLOR_GREEN, msg, COLOR_OFF)
-		break
-	case FINE:
-		output = fmt.Sprintf("%s %s %s", COLOR_BLACK, msg, COLOR_OFF)
-		break
-	case DEBUG:
-		output = fmt.Sprintf("%s %s %s", COLOR_CYAN, msg, COLOR_OFF)
-		break
-	case TRACE:
-		output = fmt.Sprintf("%s %s %s", COLOR_PURPLE, msg, COLOR_OFF)
-		break
-	case INFO:
-		output = fmt.Sprintf("%s %s %s", COLOR_WHILE, msg, COLOR_OFF)
-		break
-	case WARNING:
-		output = fmt.Sprintf("%s %s %s", COLOR_YELLOW, msg, COLOR_OFF)
-		break
-	case ERROR:
-		output = fmt.Sprintf("%s %s %s", COLOR_RED, msg, COLOR_OFF)
-		break
-	case CRITICAL:
-		output = fmt.Sprintf("%s %s %s", BG_RED_WHILE, msg, COLOR_OFF)
-		break
-	}
-	return
 }
 
 // Send a closure log message internally

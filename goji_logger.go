@@ -95,8 +95,6 @@ func NewGojiStatsd(config StatsdConfig, writeLog bool) func(http.Handler) http.H
 }
 
 func writeHttpLoging(msg string) {
-
-	msg = Global.formatColor(DEBUG, msg)
 	rec := &LogRecord{
 		Level:   DEBUG,
 		Created: time.Now(),
