@@ -54,9 +54,9 @@ var formatTests = []struct {
 		},
 		Formats: map[string]string{
 			// TODO(kevlar): How can I do this so it'll work outside of PST?
-			FORMAT_DEFAULT: "[2009/02/13 23:31:30 UTC] [EROR] [source] message\n",
-			FORMAT_SHORT:   "[23:31 13/02/09] [EROR] message\n",
-			FORMAT_ABBREV:  "[EROR] message\n",
+			FORMAT_DEFAULT: "[2009/02/13 23:31:30 UTC] [EROR] [source] \x1b[0;31m message \x1b[0m\n",
+			FORMAT_SHORT:   "[23:31 13/02/09] [EROR] \x1b[0;31m message \x1b[0m\n",
+			FORMAT_ABBREV:  "[EROR] \x1b[0;31m message \x1b[0m\n",
 		},
 	},
 }
@@ -87,7 +87,7 @@ var logRecordWriteTests = []struct {
 			Message: "message",
 			Created: now,
 		},
-		Console: "[2009/02/13 23:31:30 UTC] [CRIT] [source] message\n",
+		Console: fmt.Sprintf("[2009/02/13 23:31:30 UTC] [CRIT] [source] %s\n", formatColor(CRITICAL, "message")),
 	},
 }
 
@@ -120,7 +120,7 @@ func TestFileLogWriter(t *testing.T) {
 		LogBufferLength = buflen
 	}(LogBufferLength)
 	LogBufferLength = 0
-
+	os.Remove(testLogFile)
 	w := NewFileLogWriter(testLogFile, false)
 	if w == nil {
 		t.Fatalf("Invalid return: w should not be nil")
@@ -133,7 +133,7 @@ func TestFileLogWriter(t *testing.T) {
 
 	if contents, err := ioutil.ReadFile(testLogFile); err != nil {
 		t.Errorf("read(%q): %s", testLogFile, err)
-	} else if len(contents) != 50 {
+	} else if len(contents) != 66 {
 		t.Errorf("malformed filelog: %q (%d bytes)", string(contents), len(contents))
 	}
 }
@@ -171,7 +171,7 @@ func TestXMLLogWriter(t *testing.T) {
 
 	if contents, err := ioutil.ReadFile(testLogFile); err != nil {
 		t.Errorf("read(%q): %s", testLogFile, err)
-	} else if len(contents) != 185 {
+	} else if len(contents) != 201 {
 		t.Errorf("malformed xmllog: %q (%d bytes)", string(contents), len(contents))
 	}
 }
@@ -232,7 +232,7 @@ func TestLogger(t *testing.T) {
 
 func TestLogOutput(t *testing.T) {
 	const (
-		expected = "dc4a54630ff35da61307d0b60955d656"
+		expected = "0cc233b7e637ea53e51557cb3ce89270"
 	)
 
 	// Unbuffered output

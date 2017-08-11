@@ -83,7 +83,7 @@ func FormatLogRecord(format string, rec *LogRecord) string {
 				slice := strings.Split(rec.Source, "/")
 				out.WriteString(slice[len(slice)-1])
 			case 'M':
-				out.WriteString(rec.Message)
+				out.WriteString(formatColor(rec.Level, rec.Message))
 			}
 			if len(piece) > 1 {
 				out.Write(piece[1:])
@@ -95,6 +95,11 @@ func FormatLogRecord(format string, rec *LogRecord) string {
 	out.WriteByte('\n')
 
 	return out.String()
+}
+
+func formatColor(lvl Level, msg string) (output string) {
+	output = fmt.Sprintf("%s %s %s", lvl.Color(), msg, COLOR_OFF)
+	return
 }
 
 // This is the standard writer that prints to standard output.

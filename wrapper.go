@@ -121,7 +121,6 @@ func Migration(level Level, arg0 interface{}, args ...interface{}) {
 		msg = fmt.Sprintf(fmt.Sprint(first)+strings.Repeat(" %v", len(args)), args...)
 	}
 
-	msg = Global.formatColor(level, msg)
 	rec := &LogRecord{
 		Level:   level,
 		Created: time.Now(),
