@@ -4,7 +4,7 @@ type echoLog struct {
 }
 
 func (e *echoLog) Write(p []byte) (n int, err error) {
-	writeHttpLoging(string(p))
+	writeGormLog(string(p))
 	return 0, nil
 }
 

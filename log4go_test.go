@@ -205,6 +205,7 @@ func TestLogger(t *testing.T) {
 	}
 
 	//func (l *Logger) Warn(format string, args ...interface{}) error {}
+	l.Debug("%s %d %#v", "Warning:", 1, []int{})
 	if err := l.Warn("%s %d %#v", "Warning:", 1, []int{}); err.Error() != "Warning: 1 []int{}" {
 		t.Errorf("Warn returned invalid error: %s", err)
 	}

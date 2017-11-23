@@ -20,7 +20,7 @@ func (this GormLogger) Print(values ...interface{}) {
 		level := values[0]
 		source := fmt.Sprintf("%v", values[1])
 		lastIndex := strings.LastIndex(source, "/") + 1
-		writeHttpLoging(source[lastIndex:])
+		writeGormLog(source[lastIndex:])
 
 		if level == "sql" {
 			// duration
@@ -64,7 +64,7 @@ func (this GormLogger) Print(values ...interface{}) {
 				}
 			}
 			messages = messages + sql
-			writeHttpLoging(messages)
+			writeGojiLog(messages)
 		}
 	}
 }
@@ -76,4 +76,19 @@ func isPrintable(s string) bool {
 		}
 	}
 	return true
+}
+
+func writeGormLog(msg string) {
+	rec := &LogRecord{
+		Level:   DEBUG,
+		Created: time.Now(),
+		Source:  "GORM",
+		Message: msg,
+	}
+	for _, filt := range Global {
+		if filt.Level > rec.Level {
+			continue
+		}
+		filt.LogWrite(rec)
+	}
 }

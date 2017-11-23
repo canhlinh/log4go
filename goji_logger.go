@@ -34,20 +34,20 @@ type gojiStatds struct {
 
 func (g gojiLogger) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
-	writeHttpLoging(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.URL.Path, req.RemoteAddr))
+	writeGojiLog(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.URL.Path, req.RemoteAddr))
 	lresp := wrapWriter(resp)
 	startAt := time.Now()
 	g.h.ServeHTTP(lresp, req)
 	lresp.maybeWriteHeader()
 
 	latency := float64(time.Since(startAt)) / float64(time.Millisecond)
-	writeHttpLoging(fmt.Sprintf("Returning %d in %s", lresp.status(), fmt.Sprintf("%6.4f ms", latency)))
+	writeGojiLog(fmt.Sprintf("Returning %d in %s", lresp.status(), fmt.Sprintf("%6.4f ms", latency)))
 }
 
 func (g gojiStatds) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	startAt := time.Now()
 	if g.WriteLog {
-		writeHttpLoging(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.URL.Path, req.RemoteAddr))
+		writeGojiLog(fmt.Sprintf("Started %s '%s' from %s", req.Method, req.URL.Path, req.RemoteAddr))
 	}
 	lresp := wrapWriter(resp)
 
@@ -57,7 +57,7 @@ func (g gojiStatds) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	latency := float64(elapsedTime) / float64(time.Millisecond)
 
 	if g.WriteLog {
-		writeHttpLoging(fmt.Sprintf("Returning %d in %s", lresp.status(), fmt.Sprintf("%6.4f ms", latency)))
+		writeGojiLog(fmt.Sprintf("Returning %d in %s", lresp.status(), fmt.Sprintf("%6.4f ms", latency)))
 	}
 	statsd, err := g2s.Dial("udp", g.Config.IpPort)
 	if err != nil {
@@ -94,14 +94,17 @@ func NewGojiStatsd(config StatsdConfig, writeLog bool) func(http.Handler) http.H
 	return fn
 }
 
-func writeHttpLoging(msg string) {
+func writeGojiLog(msg string) {
 	rec := &LogRecord{
 		Level:   DEBUG,
 		Created: time.Now(),
-		Source:  "Web Controller",
+		Source:  "GojiController",
 		Message: msg,
 	}
 	for _, filt := range Global {
+		if filt.Level > rec.Level {
+			continue
+		}
 		filt.LogWrite(rec)
 	}
 }
