@@ -15,7 +15,7 @@ type GormLogger struct {
 }
 
 func (this GormLogger) Print(values ...interface{}) {
-	writeGormLog(values)
+	fmt.Println(values)
 	if len(values) > 1 {
 		level := values[0]
 		if level == "sql" {
