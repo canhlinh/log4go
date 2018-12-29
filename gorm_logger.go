@@ -64,7 +64,7 @@ func (this GormLogger) Print(values ...interface{}) {
 				}
 			}
 			messages = messages + sql
-			writeGojiLog(messages)
+			writeGormLog(messages)
 		}
 	}
 }
