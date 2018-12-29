@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 	"time"
 	"unicode"
 )
@@ -15,9 +16,10 @@ type GormLogger struct {
 }
 
 func (this GormLogger) Print(values ...interface{}) {
-	fmt.Println(values)
 	if len(values) > 1 {
 		level := values[0]
+		source := fmt.Sprintf("%v", values[1])
+		writeGormLog(source)
 		if level == "sql" {
 			// duration
 
