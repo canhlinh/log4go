@@ -15,12 +15,13 @@ type GormLogger struct {
 }
 
 func (this GormLogger) Print(values ...interface{}) {
+	writeGormLog(values)
 	if len(values) > 1 {
 		level := values[0]
 		if level == "sql" {
 			// duration
 
-			messages := fmt.Sprintf("%s[ %.2fms] ", COLOR_OFF, float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0)
+			messages := fmt.Sprintf("%s[ %.2fms] ", COLOR_PURPLE, float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0)
 			// sql
 			var sql string
 			var formattedValues []string
