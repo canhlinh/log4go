@@ -18,10 +18,6 @@ type GormLogger struct {
 func (this GormLogger) Print(values ...interface{}) {
 	if len(values) > 1 {
 		level := values[0]
-		// source := fmt.Sprintf("%v", values[1])
-		lastIndex := strings.LastIndex(source, "/") + 1
-		// writeGormLog(source[lastIndex:])
-
 		if level == "sql" {
 			// duration
 
