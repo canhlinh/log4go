@@ -21,11 +21,10 @@ func (this GormLogger) Print(values ...interface{}) {
 		source := fmt.Sprintf("%v", values[1])
 		lastIndex := strings.LastIndex(source, "/") + 1
 		writeGormLog(source[lastIndex:])
-
 		if level == "sql" {
 			// duration
 
-			messages := fmt.Sprintf("%s[ %.2fms] ", COLOR_OFF, float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0)
+			messages := fmt.Sprintf("%s[ %.2fms] ", COLOR_PURPLE, float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0)
 			// sql
 			var sql string
 			var formattedValues []string
@@ -64,7 +63,7 @@ func (this GormLogger) Print(values ...interface{}) {
 				}
 			}
 			messages = messages + sql
-			writeGojiLog(messages)
+			writeGormLog(messages)
 		}
 	}
 }
